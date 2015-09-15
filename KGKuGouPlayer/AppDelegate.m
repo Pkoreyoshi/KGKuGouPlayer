@@ -7,7 +7,8 @@
 //
 
 #import "AppDelegate.h"
-
+#import "KGWelcomePageViewController.h"
+#import "KGHomePageViewController.h"
 @interface AppDelegate ()
 
 @end
@@ -17,6 +18,41 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    //1.取得本app的版本号
+   NSDictionary*infoDict = [NSBundle mainBundle].infoDictionary;
+    NSString*newVersion=infoDict[@"CFBundleVersion"];
+    NSLog(@"newVersion %@",newVersion);
+    
+    //2.和之前保存的app版本号 对比 如果相同 则从主页启动 如果不同从欢迎页
+    
+    NSString*oldVersion=[[NSUserDefaults standardUserDefaults] objectForKey:@"CFBundleVersion"];
+    if (oldVersion == Nil) {
+        UIStoryboard*storyBoard=[UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    
+        KGWelcomePageViewController*welVC=[storyBoard instantiateViewControllerWithIdentifier:@"welPage"];
+        self.window.rootViewController = welVC;
+    }else{
+        if ([oldVersion isEqualToString:newVersion])
+        {// 从主页启动
+            UIStoryboard*storyBoard=[UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            
+            KGHomePageViewController*homeVC = [storyBoard instantiateViewControllerWithIdentifier:@"homePage"];
+         self.window.rootViewController=homeVC;
+            
+        }else{//从欢迎页启动
+            UIStoryboard*storyBoard=[UIStoryboard storyboardWithName:@"Main" bundle:nil];
+            
+            KGWelcomePageViewController*welVC=[storyBoard instantiateViewControllerWithIdentifier:@"welPage"];
+            self.window.rootViewController = welVC;
+        
+        }
+    
+    
+    }
+    
+    //3.如果不同，把新的app版本号 保存起来
+    [[NSUserDefaults standardUserDefaults]setObject:newVersion forKey:@"CFBundleVersion"];
     return YES;
 }
 
